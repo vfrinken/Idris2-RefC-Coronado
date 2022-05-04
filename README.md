@@ -1,5 +1,17 @@
-# RefC-Coronado
-A RefC backend for Idris2, based on the official RefC backend. This backend only creates shared or static libraries.
+# Idris2-RefC-Coronado
+A RefC backend for Idris2, based on the official RefC backend. This backend can create an executable, a shared or a static library. This is still work in progress
+
+
+## Changes over the Idris2 RefC Backend
+1. There is no structural difference between a pointer and a garbage collected pointer. Each struct Value_Pointer has a pointer to a freeing function (closure) which is initialized to NULL. Upon registering the pointer with the GC, the freeing function is set. This prevents certain segmentation faults, but makes it impossible to have several freeing functions associated with a pointer.
+2. Fixes to issue [2455](https://github.com/idris-lang/Idris2/issues/2455) of the Idris2 repo. The way this is done is my introducing 2 functions,
+`Value_String *makeString(char *s);` and `Value_String *useString(char *s);`. The former makes a copy of the input string to create a new string object (needed for calls such as `Value* var = (Value*)makeString(":");` whereas the latter one frees the input strings, which is used to deal with return values of FFI calls. Furthermore, all char* returning FFI calls now create a copy.
+3. Since this backend was tested by using the Idris2 code itself, placeholder Scheme evaluation functions are added in `support/refc/scheme_support.c`. 
+4. Packing and unpacking of CFTypes `CFForeignObj` and `CFInteger` are added.
+
+## Known Issues
+1. The way how to deal with `CFInteger` is probably wrong. Currently and those are mapped to `Value_Int64` structs.
+2. There is still a memory leak originating in the `idris2_currentDirectory` function. It returns a pointer (Ptr String), not a char*/String, thus the pointer is untouched and given to `prim__getString`, which creates a copy. Same with `idris2_readLine`.
 
 ## Installation
 1. Install Idris2 from git
