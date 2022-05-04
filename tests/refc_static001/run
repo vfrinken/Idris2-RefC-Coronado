@@ -1,0 +1,18 @@
+rm -rf build
+rm -rf test
+
+IDRIS_LIB_DIR=`idris2 --libdir`
+
+$1 --no-banner --no-color --console-width 0 --cg refc-coronado-static -o refc001 Test.idr > /dev/null
+
+echo static test
+cc main.c  \
+    ../../support/libidris2_refc.a \
+    ${IDRIS_LIB_DIR}/lib/libidris2_support.a \
+    build/exec/librefc001.a \
+    -I../../support \
+    -o test \
+    -Ibuild/exec/ \
+    -lgmp
+
+LD_LIBRARY_PATH=$LD_LIBRARY_PATH:build/exec/ ./test
