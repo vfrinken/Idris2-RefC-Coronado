@@ -39,6 +39,10 @@ void *idris2_getNull() {
 }
 
 char* idris2_getString(void *p) {
+    return (char*)p;
+}
+
+char* idris2_getNewString(void *p) {
     return newString((char*)p);
 }
 

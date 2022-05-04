@@ -1,5 +1,7 @@
 #pragma once
 
+char* newString(char* old);
+
 // Return non-zero if the pointer is null
 int idris2_isNull(void*);
 // Returns a NULL
@@ -7,11 +9,12 @@ void *idris2_getNull();
 // Convert a Ptr String intro a String, assuming the string has been checked
 // to be non-null
 char* idris2_getString(void *p);
+char* idris2_getNewString(void *p);
 int idris2_getErrno();
 char* idris2_strerror(int errnum);
-char* newString(char* old);
 
 char* idris2_getStr();
+
 void idris2_putStr(char* f);
 
 void idris2_sleep(int sec);
