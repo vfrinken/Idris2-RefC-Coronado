@@ -34,19 +34,15 @@ Afterwards, install api, (copies all compiled Idris2 .ttc files to the installat
 
 `make install-api`
 
-2. Install the RefC-Coronado library generator
+2. Install this repo
 
-`git clone .../refc-coronado`  (this repository)
+`git clone git@github.com:vfrinken/Idris2-RefC-Coronado.git`
 
-Compilation
-```bash
-cd refc-coronado
-make
-```
+Compilation is done with `make` which assumes `idris2` to exist 
 
 ## Result
 Idris2 with the new backends is now at `./build/exec/idris2-coronado`. The new backends are called
- _refc-coronado-shared_ and  _refc-coronado-static_.
+ _refc-coronado_,  _refc-coronado-shared_, and _refc-coronado-static_.
 
 ## Tests
 The shared library generation can be checked using the test in `tests/refc_shared001`, the static library in with
