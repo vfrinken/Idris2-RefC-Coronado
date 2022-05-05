@@ -1,0 +1,6 @@
+*.o
+*.d
+build/
+lib*.a
+lib*.so
+lib*.dylib
