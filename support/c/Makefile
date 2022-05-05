@@ -7,7 +7,7 @@ SRCS := $(wildcard *.c)
 OBJS = $(SRCS:.c=.o)
 DEPS = $(OBJS:.o=.d)
 
-CFLAGS += -O2
+CFLAGS += -O2 -fPIC
 
 ifeq ($(OS), windows)
 	SRCS += windows/win_utils.c windows/win_hack.c
@@ -27,7 +27,6 @@ build: $(LIBTARGET) $(DYLIBTARGET)
 
 $(LIBTARGET): $(OBJS)
 	$(AR) rc $@ $^
-	$(RANLIB) $@
 
 $(DYLIBTARGET): $(OBJS)
 	$(CC) -shared -o $@ $^ $(LDFLAGS)
