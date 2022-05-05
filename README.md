@@ -9,9 +9,68 @@ A RefC backend for Idris2, based on the official RefC backend. This backend can 
 3. Since this backend was tested by using the Idris2 code itself, placeholder Scheme evaluation functions are added in `support/refc/scheme_support.c`. 
 4. Packing and unpacking of CFTypes `CFForeignObj` and `CFInteger` are added.
 
+
 ## Known Issues
 1. The way how to deal with `CFInteger` is probably wrong. Currently and those are mapped to `Value_Int64` structs.
-2. There is still a memory leak originating in the `idris2_currentDirectory` function. It returns a pointer (Ptr String), not a char*/String, thus the pointer is untouched and given to `prim__getString`, which creates a copy. Same with `idris2_readLine`.
+2. There is still a memory leak originating in the `getEnv` function in 
+With additional work, we can fix that, too
+
+Add in `libs/prelude/Prelude/IO.idr :`
+
+```Idris
+%foreign "C:idris2_getNewString, libidris2_support, idris_support.h"
+         "javascript:lambda:x=>x"
+export
+prim__getNewString : Ptr String -> String
+```
+
+and in `libs/base/System.idr :`
+the snippet
+```Idris
+export
+getEnv : HasIO io => (var : String) -> io (Maybe String)
+getEnv var
+   = do env <- primIO $ prim__getEnv var
+        if prim__nullPtr env /= 0
+           then pure Nothing
+           else pure (Just (prim__getNewString env))
+```
+will lead to
+```
+$ valgrind --leak-check=full ./idris2c SomeTest.idr
+==54986== Memcheck, a memory error detector
+==54986== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
+==54986== Using Valgrind-3.13.0 and LibVEX; rerun with -h for copyright info
+==54986== Command: ../../../refc-based-idris/idris2c SomeTest.idr
+==54986==
+==54986== warning: Can't handle line info entry with line number 1048576 greater than 1048575
+==54986== (Nb: this message is only shown once)
+     ____    __     _         ___
+    /  _/___/ /____(_)____   |__ \
+    / // __  / ___/ / ___/   __/ /     Version 0.5.1-1c6590f2f
+  _/ // /_/ / /  / (__  )   / __/      https://www.idris-lang.org
+ /___/\__,_/_/  /_/____/   /____/      Type :? for help
+
+Welcome to Idris 2.  Enjoy yourself!
+Main>
+Bye for now!
+==54986==
+==54986== HEAP SUMMARY:
+==54986==     in use at exit: 17,880,553 bytes in 542,078 blocks
+==54986==   total heap usage: 81,722,739 allocs, 81,180,661 frees, 1,898,619,683 bytes allocated
+==54986==
+==54986== LEAK SUMMARY:
+==54986==    definitely lost: 0 bytes in 0 blocks
+==54986==    indirectly lost: 0 bytes in 0 blocks
+==54986==      possibly lost: 0 bytes in 0 blocks
+==54986==    still reachable: 17,880,553 bytes in 542,078 blocks
+==54986==         suppressed: 0 bytes in 0 blocks
+==54986== Reachable blocks (those to which a pointer was found) are not shown.
+==54986== To see them, rerun with: --leak-check=full --show-leak-kinds=all
+==54986==
+==54986== For counts of detected and suppressed errors, rerun with: -v
+==54986== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
+```
 
 ## Installation
 1. Install Idris2 from git
