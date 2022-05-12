@@ -20,10 +20,6 @@ codegenRefCCoronado : Codegen
 codegenRefCCoronado = MkCG (compileExprToLib ANF Exec) executeExpr Nothing Nothing
 
 
-no_execute : Ref Ctxt Defs -> (execDir : String) -> ClosedTerm -> Core ()
-no_execute defs dir term = do coreLift $ putStrLn "Maybe in an hour."
-
-
 main : IO ()
 main = mainWithCodegens [
     ("refc-coronado", codegenRefCCoronado),
