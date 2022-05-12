@@ -1076,7 +1076,7 @@ emitExportFunction (MkExportFunctionDef externalName internalName nrArgs) = do
 Value * \{externalName}(\{showSep ", " varlist})
 {
 
-    // build closure for {internalName}
+    // build closure for \{internalName}
 """
     increaseIndentation
     arglist <- makeArglist 0 (map (\i => ALocal (cast i)) (getListUpTo nrArgs))

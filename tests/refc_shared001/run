@@ -6,12 +6,14 @@ IDRIS_LIB_DIR=`idris2 --libdir`
 $1 --no-banner --no-color --console-width 0 --cg refc-coronado-shared -o refc001 Test.idr > /dev/null
 
 cc main.c  \
-    ../../support/libidris2_refc.a \
-    ${IDRIS_LIB_DIR}/lib/libidris2_support.a \
+    ../../support/refc/libidris2_refc.a \
+    ../../support/c/libidris2_support.a \
     -lrefc001 \
     -L. \
     -Lbuild/exec \
     -I../../support \
+    -I${IDRIS_LIB_DIR}/support/refc \
+    -I${IDRIS_LIB_DIR}/support/c \
     -o test \
     -Ibuild/exec/ \
     -lgmp

@@ -33,32 +33,22 @@ compileCObjectFile : {auto c : Ref Ctxt Defs}
                   -> (sourceFile : String)
                   -> (objectFile : String)
                   -> Core (Maybe String)
-compileCObjectFile {targetType=Shared} sourceFile objectFile =
-  do cc <- coreLift findCC
-     refcDir <- findDataFile "refc"
-     cDir <- findDataFile "c"
-     let runccobj = cc ++ " -Werror -c -fpic " ++ sourceFile ++
-                       " -o " ++ objectFile ++
-                       " -I" ++ refcDir ++
-                       " -I" ++ cDir
-     log "compiler.refc.cc" 10 runccobj
-     0 <- coreLift $ system runccobj
-       | _ => pure Nothing
-     pure (Just objectFile)
+compileCObjectFile {targetType} sourceFile objectFile =
+    do let libraryFlag = if targetType == Shared then "-fpic " else ""
+       cc <- coreLift findCC
+       refcDir <- findDataFile "refc"
+       cDir <- findDataFile "c"
 
-compileCObjectFile {targetType=_} sourceFile objectFile =
-  do cc <- coreLift findCC
-     refcDir <- findDataFile "refc"
-     cDir <- findDataFile "c"
-     let runccobj = cc ++ " -Werror -c " ++ sourceFile ++
-              " -o " ++ objectFile ++
-              " -I" ++ refcDir ++
-              " -I" ++ cDir
-     log "compiler.refc.cc" 10 runccobj
-     0 <- coreLift $ system runccobj
-        | _ => pure Nothing
-     pure (Just objectFile)
+       let runccobj = cc ++ " -Werror "  ++ libraryFlag ++ "-c " ++ sourceFile ++
+                         " -o " ++ objectFile ++
+                         " -I" ++ refcDir ++
+                         " -I" ++ cDir
 
+       log "compiler.refc.cc" 10 runccobj
+       0 <- coreLift $ system runccobj
+         | _ => pure Nothing
+
+       pure (Just objectFile)
 
 
 
@@ -77,9 +67,7 @@ compileStep2  {targetType=Shared} objectFile outFile =
      dirs <- getDirs
      refcDir <- findDataFile "refc"
      supportFile <- findLibraryFile "libidris2_support.a"
-
      let sharedFlag = "-shared "
-
      let runcc = cc ++ " -Werror " ++ sharedFlag ++ objectFile ++
                        " -o " ++ outFile ++ " " ++
                        supportFile ++ " " ++
@@ -91,21 +79,21 @@ compileStep2  {targetType=Shared} objectFile outFile =
      log "compiler.refc.cc" 10 runcc
      0 <- coreLift $ system runcc
        | _ => pure Nothing
-
      pure (Just outFile)
+
 compileStep2  {targetType=Static} objectFile outFile =
   do cc <- coreLift findCC
      dirs <- getDirs
+     supportFile <- findLibraryFile "libidris2_support.a"
      refcDir <- findDataFile "refc"
-
 
      let runcc = "ar rcs " ++ outFile ++ " " ++ objectFile
 
      log "compiler.refc.cc" 10 runcc
      0 <- coreLift $ system runcc
        | _ => pure Nothing
-
      pure (Just outFile)
+
 compileStep2  {targetType=Exec} objectFile outFile =
   do cc <- coreLift findCC
      dirs <- getDirs
