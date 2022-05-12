@@ -1087,6 +1087,7 @@ Value * \{externalName}(\{showSep ", " varlist})
     // end closure for {internalName}
 
     Value * fct_eval = trampoline(closure_\{internalName});
+    if(!fct_eval) return NULL;
     if(fct_eval->header.tag != 15)
     {
         // not an monadic function, but a direct result, thus return value.
