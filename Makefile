@@ -37,7 +37,9 @@ install:
 	mkdir -p ${INSTALL_PREFIX}/support/c
 	install -m 755 support/c/lib*${SHLIBSUFFIX}       ${INSTALL_BIN_PREFIX}/lib
 	install -m 644 support/c/lib*.a                   ${INSTALL_BIN_PREFIX}/lib
+	install -m 644 support/c/lib*.a                   ${INSTALL_PREFIX}/lib
 	install -m 644 support/refc/lib*.a                ${INSTALL_BIN_PREFIX}/lib
 	install -m 644 support/c/*.h                      ${INSTALL_PREFIX}/support/c
+	install -m 644 support/refc/*.h                   ${INSTALL_PREFIX}/support/refc
 	install -m 711 build/exec/${TARGET}               ${INSTALL_BIN_PREFIX}/bin
 	cp -r          build/exec/${TARGET}_app           ${INSTALL_BIN_PREFIX}/bin
